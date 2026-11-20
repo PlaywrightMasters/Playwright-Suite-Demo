@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Inventory · StockPilot</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+    <script type="module" src="/js/inventory.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <header class="topbar">
+      <a class="brand" href="/inventory"
+        ><span class="brand-mark" aria-hidden="true">SP</span>StockPilot</a
+      >
+      <nav class="main-nav" aria-label="Main">
+        <ul>
+          <li><a href="/inventory" aria-current="page">Inventory</a></li>
+          <li><a href="/reports">Reports</a></li>
+          <li><a href="/settings">Settings</a></li>
+        </ul>
+      </nav>
+      <div class="user-menu">
+        <span>Signed in as <strong data-testid="current-user">…</strong></span>
+        <button type="button" class="btn btn-small" id="logout-btn">Sign out</button>
+      </div>
+    </header>
+    <p class="sandbox-note">
+      Sandbox workspace: every sign-in starts with fresh sample data, and changes are discarded when
+      you sign out.
+    </p>
+
+    <main id="main" class="page" tabindex="-1">
+      <div class="page-header">
+        <div>
+          <h1>Inventory</h1>
+          <p>Track products, stock levels and availability.</p>
+        </div>
+      </div>
+
+      <section class="kpis" aria-label="Inventory summary">
+        <div class="card kpi">
+          <p class="kpi-label">Total products</p>
+          <p class="kpi-value" data-testid="kpi-total">–</p>
+        </div>
+        <div class="card kpi">
+          <p class="kpi-label">Low stock</p>
+          <p class="kpi-value" data-testid="kpi-low">–</p>
+        </div>
+        <div class="card kpi">
+          <p class="kpi-label">Out of stock</p>
+          <p class="kpi-value" data-testid="kpi-out">–</p>
+        </div>
+        <div class="card kpi">
+          <p class="kpi-label">Inventory value</p>
+          <p class="kpi-value" data-testid="kpi-value">–</p>
+        </div>
+      </section>
+
+      <section class="card toolbar" aria-label="Filters">
+        <div class="field search-field">
+          <label for="search">Search</label>
+          <input id="search" type="search" placeholder="Name or SKU" autocomplete="off" />
+        </div>
+        <div class="field">
+          <label for="category-filter">Category</label>
+          <select id="category-filter">
+            <option value="">All categories</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="status-filter">Status</label>
+          <select id="status-filter">
+            <option value="all">All statuses</option>
+            <option value="active">Active</option>
+            <option value="archived">Archived</option>
+          </select>
+        </div>
+        <button type="button" class="btn btn-primary" id="add-product-btn">Add product</button>
+      </section>
+
+      <div class="result-meta">
+        <p id="result-count" data-testid="result-count" aria-live="polite">Loading products…</p>
+        <button type="button" class="btn btn-ghost btn-small" id="clear-filters-btn" hidden>
+          Clear filters
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="table-wrap" id="table-wrap">
+          <table id="products-table" data-testid="products-table" data-density="comfortable">
+            <caption class="sr-only">
+              Products
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col" data-sort-col="sku">
+                  <button type="button" class="sort-btn" data-sort="sku">SKU</button>
+                </th>
+                <th scope="col" data-sort-col="name">
+                  <button type="button" class="sort-btn" data-sort="name">Name</button>
+                </th>
+                <th scope="col">Category</th>
+                <th scope="col" class="num" data-sort-col="price">
+                  <button type="button" class="sort-btn" data-sort="price">Price</button>
+                </th>
+                <th scope="col" class="num" data-sort-col="quantity">
+                  <button type="button" class="sort-btn" data-sort="quantity">Qty</button>
+                </th>
+                <th scope="col">Stock</th>
+                <th scope="col">Active</th>
+                <th scope="col"><span class="sr-only">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody id="products-body"></tbody>
+          </table>
+        </div>
+        <div class="state-panel" id="empty-state" data-testid="empty-state" hidden>
+          <p><strong>No products match your filters.</strong></p>
+          <p>Try a different search term or clear the filters.</p>
+        </div>
+        <div class="state-panel" id="error-state" data-testid="error-state" hidden>
+          <p><strong>We couldn't load products.</strong></p>
+          <button type="button" class="btn" id="retry-btn">Try again</button>
+        </div>
+      </div>
+    </main>
+
+    <dialog id="product-dialog" aria-labelledby="product-dialog-title">
+      <form id="product-form" novalidate>
+        <div class="dialog-body">
+          <h2 id="product-dialog-title">Add product</h2>
+          <div
+            class="form-alert"
+            id="product-form-error"
+            data-testid="form-error"
+            role="alert"
+          ></div>
+          <div class="form-grid">
+            <div class="field span-2">
+              <label for="product-name">Name</label>
+              <input
+                id="product-name"
+                name="name"
+                type="text"
+                maxlength="80"
+                autocomplete="off"
+                aria-describedby="product-name-error"
+              />
+              <p class="field-error" id="product-name-error"></p>
+            </div>
+            <div class="field">
+              <label for="product-sku">SKU</label>
+              <input
+                id="product-sku"
+                name="sku"
+                type="text"
+                autocomplete="off"
+                autocapitalize="characters"
+                spellcheck="false"
+                placeholder="SP-1234"
+                aria-describedby="product-sku-hint product-sku-error"
+              />
+              <p class="hint" id="product-sku-hint">2–4 letters, a dash, 3–6 digits</p>
+              <p class="field-error" id="product-sku-error"></p>
+            </div>
+            <div class="field">
+              <label for="product-category">Category</label>
+              <select
+                id="product-category"
+                name="category"
+                aria-describedby="product-category-error"
+              >
+                <option value="">Choose a category</option>
+              </select>
+              <p class="field-error" id="product-category-error"></p>
+            </div>
+            <div class="field">
+              <label for="product-price">Price</label>
+              <input
+                id="product-price"
+                name="price"
+                type="number"
+                inputmode="decimal"
+                min="0"
+                step="0.01"
+                aria-describedby="product-price-error"
+              />
+              <p class="field-error" id="product-price-error"></p>
+            </div>
+            <div class="field">
+              <label for="product-quantity">Quantity</label>
+              <input
+                id="product-quantity"
+                name="quantity"
+                type="number"
+                inputmode="numeric"
+                min="0"
+                step="1"
+                aria-describedby="product-quantity-error"
+              />
+              <p class="field-error" id="product-quantity-error"></p>
+            </div>
+            <div class="span-2">
+              <label class="check">
+                <input type="checkbox" id="product-active" name="active" checked />
+                Active (counted in stock levels and reports)
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="dialog-actions">
+          <button type="button" class="btn" id="product-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="product-save">Save product</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div id="toast-region" class="toast-region" aria-live="polite"></div>
+  </body>
+</html>

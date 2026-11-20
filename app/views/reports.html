@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Reports · StockPilot</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+    <script type="module" src="/js/reports.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <header class="topbar">
+      <a class="brand" href="/inventory"
+        ><span class="brand-mark" aria-hidden="true">SP</span>StockPilot</a
+      >
+      <nav class="main-nav" aria-label="Main">
+        <ul>
+          <li><a href="/inventory">Inventory</a></li>
+          <li><a href="/reports" aria-current="page">Reports</a></li>
+          <li><a href="/settings">Settings</a></li>
+        </ul>
+      </nav>
+      <div class="user-menu">
+        <span>Signed in as <strong data-testid="current-user">…</strong></span>
+        <button type="button" class="btn btn-small" id="logout-btn">Sign out</button>
+      </div>
+    </header>
+    <p class="sandbox-note">
+      Sandbox workspace: every sign-in starts with fresh sample data, and changes are discarded when
+      you sign out.
+    </p>
+
+    <main id="main" class="page" tabindex="-1">
+      <div class="page-header">
+        <div>
+          <h1>Reports</h1>
+          <p>Stock health and recent changes in this workspace.</p>
+        </div>
+        <button type="button" class="btn btn-primary" id="export-btn">Export CSV</button>
+      </div>
+
+      <section class="kpis" aria-label="Report summary">
+        <div class="card kpi">
+          <p class="kpi-label">Total products</p>
+          <p class="kpi-value" data-testid="stat-total-products">–</p>
+        </div>
+        <div class="card kpi">
+          <p class="kpi-label">Units in stock</p>
+          <p class="kpi-value" data-testid="stat-total-units">–</p>
+        </div>
+        <div class="card kpi">
+          <p class="kpi-label">Inventory value</p>
+          <p class="kpi-value" data-testid="stat-inventory-value">–</p>
+        </div>
+        <div class="card kpi">
+          <p class="kpi-label">Low stock</p>
+          <p class="kpi-value" data-testid="stat-low-stock">–</p>
+        </div>
+        <div class="card kpi">
+          <p class="kpi-label">Out of stock</p>
+          <p class="kpi-value" data-testid="stat-out-of-stock">–</p>
+        </div>
+      </section>
+
+      <div class="grid-2">
+        <section class="card section" aria-labelledby="by-category-title">
+          <h2 id="by-category-title">Stock by category</h2>
+          <p class="hint">Active products only.</p>
+          <div class="table-wrap">
+            <table data-testid="category-table">
+              <thead>
+                <tr>
+                  <th scope="col">Category</th>
+                  <th scope="col" class="num">Products</th>
+                  <th scope="col" class="num">Units</th>
+                  <th scope="col" class="num">Value</th>
+                  <th scope="col">Share</th>
+                </tr>
+              </thead>
+              <tbody id="category-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="card section" aria-labelledby="activity-title">
+          <div class="section-header">
+            <h2 id="activity-title">Recent activity</h2>
+            <div>
+              <label class="sr-only" for="activity-filter">Filter activity</label>
+              <select id="activity-filter">
+                <option value="">All activity</option>
+                <option value="create">Products added</option>
+                <option value="update">Products edited</option>
+                <option value="delete">Products deleted</option>
+                <option value="status">Status changes</option>
+                <option value="settings">Settings changes</option>
+                <option value="reset">Workspace resets</option>
+              </select>
+            </div>
+          </div>
+          <ol class="activity-list" id="activity-list" data-testid="activity-list"></ol>
+          <div class="state-panel" id="activity-empty" data-testid="activity-empty" hidden>
+            <p>No activity yet. Changes you make in this workspace will appear here.</p>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <div id="toast-region" class="toast-region" aria-live="polite"></div>
+  </body>
+</html>

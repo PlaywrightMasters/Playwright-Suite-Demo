@@ -1,0 +1,137 @@
+name: Playwright
+
+# Tiered pipeline:
+#   quality    → every push and PR: lint, typecheck, formatting
+#   smoke      → every push and PR: @smoke on Chromium + API (~1 min)
+#   critical   → PRs and main: @critical on every project (required check)
+#   regression → PRs into main and main itself, after critical passes: @regression everywhere
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  CI: true
+  FORCE_COLOR: 1
+
+jobs:
+  quality:
+    name: Lint · typecheck · format
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run format:check
+
+  smoke:
+    name: Smoke (@smoke · chromium + api)
+    needs: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Run smoke tests
+        run: npx playwright test --grep @smoke --project=chromium --project=api
+      - name: Upload report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: smoke-report
+          path: playwright-report/
+          retention-days: 7
+
+  critical:
+    name: Critical (@critical · ${{ matrix.project }})
+    needs: smoke
+    if: github.event_name != 'push' || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { project: chromium, browser: chromium }
+          - { project: firefox, browser: firefox }
+          - { project: webkit, browser: webkit }
+          - { project: mobile-chrome, browser: chromium }
+          - { project: api, browser: '' }
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Install ${{ matrix.browser }}
+        if: matrix.browser != ''
+        run: npx playwright install --with-deps ${{ matrix.browser }}
+      - name: Run critical tests
+        run: npx playwright test --grep @critical --project=${{ matrix.project }}
+      - name: Upload report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: critical-report-${{ matrix.project }}
+          path: playwright-report/
+          retention-days: 14
+
+  regression:
+    name: Regression (@regression · ${{ matrix.project }})
+    needs: critical
+    if: >-
+      (github.event_name == 'pull_request' && github.base_ref == 'main') ||
+      github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { project: chromium, browser: chromium }
+          - { project: firefox, browser: firefox }
+          - { project: webkit, browser: webkit }
+          - { project: mobile-chrome, browser: chromium }
+          - { project: api, browser: '' }
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Install ${{ matrix.browser }}
+        if: matrix.browser != ''
+        run: npx playwright install --with-deps ${{ matrix.browser }}
+      - name: Run regression tests
+        run: npx playwright test --grep @regression --project=${{ matrix.project }}
+      - name: Upload report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: regression-report-${{ matrix.project }}
+          path: playwright-report/
+          retention-days: 30

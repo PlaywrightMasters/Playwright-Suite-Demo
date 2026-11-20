@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Settings · StockPilot</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+    <script type="module" src="/js/settings.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <header class="topbar">
+      <a class="brand" href="/inventory"
+        ><span class="brand-mark" aria-hidden="true">SP</span>StockPilot</a
+      >
+      <nav class="main-nav" aria-label="Main">
+        <ul>
+          <li><a href="/inventory">Inventory</a></li>
+          <li><a href="/reports">Reports</a></li>
+          <li><a href="/settings" aria-current="page">Settings</a></li>
+        </ul>
+      </nav>
+      <div class="user-menu">
+        <span>Signed in as <strong data-testid="current-user">…</strong></span>
+        <button type="button" class="btn btn-small" id="logout-btn">Sign out</button>
+      </div>
+    </header>
+    <p class="sandbox-note">
+      Sandbox workspace: every sign-in starts with fresh sample data, and changes are discarded when
+      you sign out.
+    </p>
+
+    <main id="main" class="page" tabindex="-1">
+      <div class="page-header">
+        <div>
+          <h1>Settings</h1>
+          <p>Preferences for this workspace.</p>
+        </div>
+      </div>
+
+      <form id="settings-form" class="card section" novalidate aria-labelledby="prefs-title">
+        <h2 id="prefs-title">Inventory preferences</h2>
+
+        <div class="field">
+          <label for="threshold">Low-stock threshold</label>
+          <p class="hint" id="threshold-hint">
+            Products at or below this quantity are flagged as low stock.
+          </p>
+          <div class="range-row">
+            <input
+              type="range"
+              id="threshold"
+              name="lowStockThreshold"
+              min="0"
+              max="50"
+              step="1"
+              value="10"
+              aria-describedby="threshold-hint"
+            />
+            <output id="threshold-value" for="threshold" data-testid="threshold-value">10</output>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="currency">Display currency</label>
+          <select id="currency" name="currency">
+            <option value="USD">US dollar (USD)</option>
+            <option value="EUR">Euro (EUR)</option>
+            <option value="INR">Indian rupee (INR)</option>
+          </select>
+        </div>
+
+        <fieldset>
+          <legend>Table density</legend>
+          <label class="check"
+            ><input type="radio" name="density" value="comfortable" /> Comfortable</label
+          >
+          <label class="check"><input type="radio" name="density" value="compact" /> Compact</label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Notifications</legend>
+          <label class="check"
+            ><input type="checkbox" id="email-alerts" name="emailAlerts" /> Email me when items run
+            low</label
+          >
+          <label class="check"
+            ><input type="checkbox" id="daily-digest" name="dailyDigest" /> Send a daily stock
+            digest</label
+          >
+        </fieldset>
+
+        <fieldset>
+          <legend>Category order</legend>
+          <p class="hint" id="order-hint">
+            Drag a handle or use the arrow buttons. This order is used by filters and reports.
+          </p>
+          <ol
+            class="sortable"
+            id="category-order"
+            data-testid="category-order"
+            aria-describedby="order-hint"
+          ></ol>
+          <p class="sr-only" id="order-status" aria-live="polite"></p>
+        </fieldset>
+
+        <div class="form-footer">
+          <button type="submit" class="btn btn-primary" id="save-settings">Save settings</button>
+          <button type="button" class="btn" id="discard-settings" disabled>Discard changes</button>
+          <span class="unsaved" id="unsaved-indicator" data-testid="unsaved-indicator" hidden
+            >Unsaved changes</span
+          >
+        </div>
+      </form>
+
+      <details class="danger-zone" data-testid="danger-zone">
+        <summary>Danger zone</summary>
+        <div class="danger-body">
+          <p>
+            Reset this workspace to the original sample products and default settings. This can't be
+            undone.
+          </p>
+          <button type="button" class="btn btn-danger" id="reset-workspace">Reset workspace</button>
+        </div>
+      </details>
+    </main>
+
+    <div id="toast-region" class="toast-region" aria-live="polite"></div>
+  </body>
+</html>

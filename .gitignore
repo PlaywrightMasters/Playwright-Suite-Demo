@@ -46,3 +46,17 @@ next-env.d.ts
 .eslintcache
 .turbo
 .swc
+
+# keep the documented env template
+!.env.example
+
+# playwright
+/playwright-report/
+/blob-report/
+/test-results/
+/playwright/.cache/
+/all-blob-reports/
+
+# local tooling
+.claude/
+*.log

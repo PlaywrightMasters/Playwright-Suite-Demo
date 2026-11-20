@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sign in · StockPilot</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+    <script type="module" src="/js/login.js"></script>
+  </head>
+  <body>
+    <main class="login-wrap" id="main">
+      <div class="card login-card">
+        <span class="brand"><span class="brand-mark" aria-hidden="true">SP</span>StockPilot</span>
+        <h1>Sign in</h1>
+        <p class="lede">Manage products, stock levels and inventory reports.</p>
+
+        <p class="notice" id="session-notice" data-testid="session-notice" role="status" hidden></p>
+        <div class="form-alert" id="login-error" role="alert"></div>
+
+        <form id="login-form" novalidate>
+          <div class="field">
+            <label for="username">Username</label>
+            <input
+              id="username"
+              name="username"
+              type="text"
+              autocomplete="username"
+              autocapitalize="none"
+              spellcheck="false"
+              aria-describedby="username-error"
+            />
+            <p class="field-error" id="username-error"></p>
+          </div>
+          <div class="field">
+            <label for="password">Password</label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              aria-describedby="password-error"
+            />
+            <p class="field-error" id="password-error"></p>
+          </div>
+          <button type="submit" class="btn btn-primary" id="login-submit">Sign in</button>
+        </form>
+
+        <p class="demo-hint">
+          Demo credentials (default): <code>admin</code> / <code>stockpilot123</code>
+        </p>
+      </div>
+    </main>
+  </body>
+</html>

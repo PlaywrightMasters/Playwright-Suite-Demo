@@ -1,0 +1,50 @@
+{
+  "name": "playwright-suite-demo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Production-style Playwright + TypeScript test suite for StockPilot, a co-located inventory admin app",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "tsx app/server.ts",
+    "dev": "tsx watch app/server.ts",
+    "test": "playwright test",
+    "test:smoke": "playwright test --grep @smoke",
+    "test:critical": "playwright test --grep @critical",
+    "test:regression": "playwright test --grep @regression",
+    "test:e2e": "playwright test tests/e2e",
+    "test:api": "playwright test --project=api",
+    "test:a11y": "playwright test tests/accessibility --project=chromium",
+    "test:headed": "playwright test --project=chromium --headed",
+    "test:ui": "playwright test --ui",
+    "test:report": "playwright show-report",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "npm run lint && npm run typecheck && npm run format:check",
+    "demo:break": "node scripts/demo.mjs break",
+    "demo:fix": "node scripts/demo.mjs fix",
+    "demo:status": "node scripts/demo.mjs status"
+  },
+  "dependencies": {
+    "express": "^5.3.0"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.65.1",
+    "@types/express": "^5.0.6",
+    "@types/node": "^24.19.2",
+    "eslint": "^10.15.0",
+    "eslint-plugin-playwright": "^2.12.2",
+    "globals": "^17.14.0",
+    "prettier": "^3.10.1",
+    "tsx": "^4.23.15",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.73.0"
+  }
+}
